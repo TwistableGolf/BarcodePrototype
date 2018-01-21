@@ -41,6 +41,7 @@ class SageoneClient {
                     "grant_type" => "authorization_code",
                     "redirect_uri" => $this->callback_url);
 
+
     $response = $this->getToken($params);
     return $response;
   }
@@ -54,6 +55,12 @@ class SageoneClient {
 
     $response = $this->getToken($params);
     return $response;
+  }
+
+  public function renewRedirect($refresh_token){
+    $res = $this->renewAccessToken($refresh_token);
+    $res = urlencode($res);
+    return "http://localhost/BarcodePrototype/sageone_data.php?token_response=".$res."&country=IE";
   }
 
   /* GET request */
@@ -116,14 +123,18 @@ class SageoneClient {
 
   private function getToken($params) {
     $url = $this->token_endpoint;
-    $options = array('http' => array('header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                                     'method'  => 'POST',
-                                     'content' => http_build_query($params)));
-    $context  = stream_context_create($options);
-    $result = file_get_contents($url, false, $context);
-    if ($result === FALSE) { /* Handle error */ }
+    $ch = curl_init();
 
-    return $result;
+    curl_setopt($ch, CURLOPT_URL,$url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS,http_build_query($params));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $server_output = curl_exec ($ch);
+    $server_output =  substr($server_output, 0, -1);
+    curl_close ($ch);
+    if ($server_output === FALSE) { /* Handle error */ }
+
+    return $server_output;
   }
 }
 

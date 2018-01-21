@@ -6,7 +6,14 @@ include 'sageone_constants.php';
 $sageone_client = new SageoneClient($client_id, $client_secret, $callback_url, $auth_endpoint, $token_endpoint, $scope);
 
 /* get the redirect url for authorisation */
-$redirect_url = $sageone_client->authRedirect();
+
+$cookie_name = "RefreshToken";
+if(!isset($_COOKIE[$cookie_name])) {
+  $redirect_url = $sageone_client->authRedirect();
+} else {
+  $redirect_url = $sageone_client->renewRedirect($_COOKIE[$cookie_name]);
+  echo $redirect_url;
+}
 ?>
 <html>
   <head>
@@ -22,7 +29,7 @@ $redirect_url = $sageone_client->authRedirect();
   <body>
   <header class="navbar navbar-fixed-top navbar-inverse">
   <div class="container">
-    <a id="logo" href="/SageOneSampleApp">Sage One API Sample App</a>
+    <a id="logo" href="/BarcodePrototype">Sage One API Sample App</a>
   </div>
 </header>
   <div class="container">

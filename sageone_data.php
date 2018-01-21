@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <?php
 $response = $_GET['token_response'];
+$cookie_name = "RefreshToken";
 $access_token = json_decode($response, true)['access_token'];
-$resource_owner_id = json_decode($response, true)['resource_owner_id'];
+$cookie_value = json_decode($response, true)['refresh_token'];
+if(isset($_COOKIE[$cookie_name])) {
+  $resource_owner_id = json_decode($response, true)['requested_by_id'];
+} else {
+  $resource_owner_id = json_decode($response, true)['requested_by_id'];
+}
+
 $country = $_GET['country'];
-/* prettify JSON response for readability */
+
 $json = json_decode($response);
 $pretty_json = json_encode($json, JSON_PRETTY_PRINT);
+
+
+if(!isset($_COOKIE[$cookie_name])) {
+    setcookie($cookie_name, $cookie_value, time() + (10 * 365 * 24 * 60 * 60), '/');
+} else {
+    setcookie($cookie_name, $cookie_value, time() + (10 * 365 * 24 * 60 * 60), '/');
+}
 ?>
 <html>
   <head>
@@ -24,7 +38,7 @@ $pretty_json = json_encode($json, JSON_PRETTY_PRINT);
   <body>
     <header class="navbar navbar-fixed-top navbar-inverse">
       <div class="container">
-        <a id="logo" href="/">Sage One API Sample App</a>
+        <a id="logo" href="/BarcodePrototype">Sage One API Sample App</a>
       </div>
     </header>
     <div class="container">
